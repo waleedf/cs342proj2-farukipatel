@@ -23,6 +23,36 @@ public class Card {
         return value;
     }
 
+    public String getImageFileName() {
+        String suitName;
+        switch(suit) {
+            case 'C':
+                suitName = "clubs";
+                break;
+            case 'D':
+                suitName = "diamonds";
+                break;
+            case 'H':
+                suitName = "hearts";
+                break;
+            case 'S':
+                suitName = "spades";
+                break;
+            default: throw new IllegalStateException("Unexpected value: " + suit);
+        }
+
+        String valueName;
+        switch (value) {
+            case 11: valueName = "Jack"; break;
+            case 12: valueName = "Queen"; break;
+            case 13: valueName = "King"; break;
+            case 14: valueName = "Ace"; break;
+            default: valueName = String.valueOf(value); break;
+        }
+        return valueName + "_of_" + suitName + ".png";
+    }
+
+
     // Utility method to display card details
     @Override
     public String toString() {

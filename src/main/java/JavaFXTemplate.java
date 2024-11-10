@@ -1,14 +1,43 @@
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import javafx.scene.layout.*;
+import java.util.ArrayList;
 
 public class JavaFXTemplate extends Application {
 
 	private static Stage primaryStage; // Make primaryStage static to ensure it’s accessible in static contexts
 
+	private VBox gameplayPhase;
+	@FXML
+	private Label playerTurnIndicator, player1AnteBetLabel, player1PairPlusBetLabel, player1PlayBetLabel, player1WinningsLabel;
+
+	@FXML
+	private ImageView dealerCard1, dealerCard2, dealerCard3, playerCard1, playerCard2, playerCard3;
+
+	@FXML
+	private TextField anteBetField, pairPlusBetField;
+
+	@FXML
+	private Label currentBetAmountLabel, gameInfo;
+
+    private Dealer dealer;
+    private Player player1;
+
+	private String cardPath = "/cards/";
+
+	public void initialize() {
+		dealer = new Dealer();
+		player1 = new Player();
+	}
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -51,15 +80,53 @@ public class JavaFXTemplate extends Application {
 	}
 
 	public void beginGame(ActionEvent event) {
-		System.out.println("Begin Game button pressed");
+		try {
+			System.out.println("Begin Game button pressed");
+			int anteBet = Integer.parseInt(anteBetField.getText());
+			int pairPlusBet = Integer.parseInt(pairPlusBetField.getText());
+			player1.setAnteBet(anteBet);
+			player1.setPairPlusBet(pairPlusBet);
+			dealer.dealDealersHand();
+			player1.setHand(dealer.dealHand());
+			updateUI();
+			updateCardImages(player1.getHand(), playerCard1, playerCard2, playerCard3);
+			updateCardImages(dealer.getDealersHand(), dealerCard1, dealerCard2, dealerCard3);
+		} catch (Exception e) {
+			gameInfo.setText("Error: " + e.getMessage());
+		}
 	}
+
+	private void updateCardImages(ArrayList<Card> hand, ImageView... imageViews) {
+		for(int i = 0; i < hand.size(); ++i) {
+			String filename = hand.get(i).getImageFileName();
+			imageViews[i].setImage(new Image(getClass().getResourceAsStream(cardPath + filename)));
+		}
+	}
+
+	
+
+	private void updateUI() {
+        player1AnteBetLabel.setText("Ante: $" + player1.getAnteBet());
+        player1PairPlusBetLabel.setText("Pair Plus: $" + player1.getPairPlusBet());
+        player1PlayBetLabel.setText("Play: $" + player1.getPlayBet());
+        player1WinningsLabel.setText("Total Winnings: $" + player1.getTotalWinnings());
+    }
 
 	public void play(ActionEvent event) {
 		System.out.println("Play button pressed");
+		player1.setPlayBet(player1.getAnteBet());
+		
 	}
 
 	public void fold(ActionEvent event) {
 		System.out.println("Fold button pressed");
+		gameInfo.setText("You fold! Dealer wins!");
+		resetBets();
+	}
+
+	private void resetBets() {
+		player1.resetBets();
+		updateUI();
 	}
 
 	public void exitGame(ActionEvent event) {
@@ -68,6 +135,10 @@ public class JavaFXTemplate extends Application {
 
 	public void freshStart(ActionEvent event) {
 		System.out.println("Fresh Start option selected");
+		dealer = new Dealer();
+		player1 = new Player();
+		gameplayPhase.setVisible(false);
+		updateUI();
 	}
 
 	public void applyNewLook(ActionEvent event) {
