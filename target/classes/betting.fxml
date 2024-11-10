@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="10" alignment="CENTER" fx:controller="JavaFXTemplate">
+    
+    <!-- Menu Bar with Options -->
+    <MenuBar>
+        <Menu text="Options">
+            <MenuItem text="Exit" onAction="#exitGame" />
+            <MenuItem text="Fresh Start" onAction="#freshStart" />
+            <MenuItem text="New Look" onAction="#applyNewLook" />
+        </Menu>
+    </MenuBar>
+
+    <!-- Top Section: Player Turn Indicator and Options -->
+    <HBox spacing="15" alignment="CENTER">
+        <Label fx:id="playerTurnIndicator" text="Current Turn: Player One" />
+        <Button text="Player Info" onAction="#showPlayerInfo" />
+        <Button text="Options" onAction="#showOptions" />
+    </HBox>
+
+    <!-- Card Display Area for Dealer and Player -->
+    <HBox spacing="20" alignment="CENTER">
+        <VBox alignment="CENTER">
+            <Label text="Dealer Cards" />
+            <HBox fx:id="dealerCards" spacing="10">
+                <ImageView fx:id="dealerCard1" fitHeight="100" fitWidth="70" />
+                <ImageView fx:id="dealerCard2" fitHeight="100" fitWidth="70" />
+                <ImageView fx:id="dealerCard3" fitHeight="100" fitWidth="70" />
+            </HBox>
+        </VBox>
+        
+        <VBox alignment="CENTER">
+            <Label text="Player Cards" />
+            <HBox fx:id="playerCards" spacing="10">
+                <ImageView fx:id="playerCard1" fitHeight="100" fitWidth="70" />
+                <ImageView fx:id="playerCard2" fitHeight="100" fitWidth="70" />
+                <ImageView fx:id="playerCard3" fitHeight="100" fitWidth="70" />
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <!-- Betting Phase Elements -->
+    <VBox spacing="10" alignment="CENTER">
+        <Label text="Enter Bets (Between $5 and $25)" />
+        <HBox spacing="10" alignment="CENTER">
+            <Label text="Ante Bet: " />
+            <TextField fx:id="anteBetField" promptText="Enter Ante Bet" />
+            <Label text="Pair Plus Bet: " />
+            <TextField fx:id="pairPlusBetField" promptText="Enter Pair Plus Bet" />
+        </HBox>
+        <Button fx:id="beginGameButton" text="Begin Game" onAction="#beginGame" />
+    </VBox>
+
+    <!-- Gameplay Phase Elements -->
+    <VBox spacing="10" alignment="CENTER" fx:id="gameplayPhase" visible="false">
+        <HBox spacing="10">
+            <Button text="Play" onAction="#play" />
+            <Button text="Fold" onAction="#fold" />
+        </HBox>
+        <Label fx:id="currentBetAmountLabel" text="Current Bet Amount: $0" />
+        <Label fx:id="gameInfo" text="Game Info: " wrapText="true" />
+    </VBox>
+    
+    <!-- Player Wager and Winnings Display -->
+    <HBox spacing="20" alignment="CENTER">
+        <VBox alignment="CENTER">
+            <Label text="Player One Wagers" />
+            <Label fx:id="player1AnteBetLabel" text="Ante: $0" />
+            <Label fx:id="player1PairPlusBetLabel" text="Pair Plus: $0" />
+            <Label fx:id="player1PlayBetLabel" text="Play: $0" />
+            <Label fx:id="player1WinningsLabel" text="Total Winnings: $0" />
+        </VBox>
+        <VBox alignment="CENTER">
+            <Label text="Player Two Wagers" />
+            <Label fx:id="player2AnteBetLabel" text="Ante: $0" />
+            <Label fx:id="player2PairPlusBetLabel" text="Pair Plus: $0" />
+            <Label fx:id="player2PlayBetLabel" text="Play: $0" />
+            <Label fx:id="player2WinningsLabel" text="Total Winnings: $0" />
+        </VBox>
+    </HBox>
+
+</VBox>
