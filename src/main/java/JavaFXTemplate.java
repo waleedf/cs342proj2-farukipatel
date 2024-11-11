@@ -1,6 +1,8 @@
+import java.util.ArrayList;
+
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,12 +12,11 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
-
-import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import java.io.InputStream;
 
 public class JavaFXTemplate extends Application {
 
@@ -70,6 +71,9 @@ public class JavaFXTemplate extends Application {
 	private TextField player2AnteBet;
 	@FXML
 	private TextField player2PairPlusBet;
+	@FXML
+	private ImageView dealerCardOne, dealerCardTwo, dealerCardThree, playerCard1One, playerCard1Two, playerCard1Three, playerCard2One, playerCard2Two, playerCard2Three;
+	private String cardPath = "/cards/";
 
 	@FXML
 	private Label dealerQualificationLabel;
@@ -273,6 +277,18 @@ public class JavaFXTemplate extends Application {
 		pause.play();
 	}
 
+	private void updateCardImages(ArrayList<Card> hand, ImageView... imageViews) {
+		for(int i = 0; i < hand.size(); ++i) {
+			String filename = cardPath + hand.get(i).getImageFileName();
+			InputStream imageStream = getClass().getResourceAsStream(filename);
+			if(imageStream == null) {
+				System.out.println("Image not found: " + filename);
+				continue;
+			}
+			imageViews[i].setImage(new Image(imageStream));
+		}
+	}
+
 	private void dealCards() {
 		if (gameState == GameState.DEALING) {
 			// Dealing cards to players and dealer using Deck and Dealer classes
@@ -283,17 +299,9 @@ public class JavaFXTemplate extends Application {
 			dealer.dealDealersHand();
 
 			// Update card labels in UI
-			player1Card1.setText(player1Hand.get(0).toString());
-			player1Card2.setText(player1Hand.get(1).toString());
-			player1Card3.setText(player1Hand.get(2).toString());
-
-			player2Card1.setText(player2Hand.get(0).toString());
-			player2Card2.setText(player2Hand.get(1).toString());
-			player2Card3.setText(player2Hand.get(2).toString());
-
-			dealerCard1.setStyle("-fx-fill: lightgrey; -fx-stroke: black;"); // Example placeholder for now
-			dealerCard2.setStyle("-fx-fill: lightgrey; -fx-stroke: black;");
-			dealerCard3.setStyle("-fx-fill: lightgrey; -fx-stroke: black;");
+			updateCardImages(player1Hand, playerCard1One, playerCard1Two, playerCard1Three);
+			updateCardImages(player2Hand, playerCard2One, playerCard2Two, playerCard2Three);
+			updateCardImages(dealer.getDealersHand(), dealerCardOne, dealerCardTwo, dealerCardThree);
 
 			// Additional debug messages
 			System.out.println("Player 1 Hand dealt: " + player1.getHand());
