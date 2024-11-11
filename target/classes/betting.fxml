@@ -19,8 +19,6 @@
     <!-- Top Section: Player Turn Indicator and Options -->
     <HBox spacing="15" alignment="CENTER">
         <Label fx:id="playerTurnIndicator" text="Current Turn: Player One" />
-        <Button text="Player Info" onAction="#showPlayerInfo" />
-        <Button text="Options" onAction="#showOptions" />
     </HBox>
 
     <!-- Betting Area -->
