@@ -11,7 +11,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
- <dependencies>
+  <dependencies>
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
@@ -31,9 +31,9 @@
         <artifactId>javafx-fxml</artifactId>
         <version>19.0.2.1</version>
     </dependency>
-</dependencies>
+  </dependencies>
 
-<build>
+  <build>
     <plugins>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -51,6 +51,14 @@
             </configuration>
         </plugin>
     </plugins>
-</build>
-
+    
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.fxml</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.image.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" spacing="10" alignment="CENTER" fx:controller="JavaFXTemplate">
-    
+<VBox xmlns:fx="http://javafx.com/fxml" alignment="CENTER" spacing="20" style="-fx-padding: 20;" fx:controller="JavaFXTemplate" stylesheets="@gameStyles.css">
+    <!-- Title for Betting Screen -->
+    <Label text="Place Your Bets" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
     <!-- Menu Bar with Options -->
     <MenuBar>
         <Menu text="Options">
@@ -22,65 +22,71 @@
         <Button text="Options" onAction="#showOptions" />
     </HBox>
 
-    <!-- Card Display Area for Dealer and Player -->
-    <HBox spacing="20" alignment="CENTER">
-        <VBox alignment="CENTER">
-            <Label text="Dealer Cards" />
-            <HBox fx:id="dealerCards" spacing="10">
-                <ImageView fx:id="dealerCard1" fitHeight="100" fitWidth="70" />
-                <ImageView fx:id="dealerCard2" fitHeight="100" fitWidth="70" />
-                <ImageView fx:id="dealerCard3" fitHeight="100" fitWidth="70" />
-            </HBox>
+    <!-- Betting Area -->
+    <HBox alignment="CENTER" spacing="20">
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="Player 1 Bets" style="-fx-font-size: 16px;" />
+            <TextField fx:id="player1AnteBet" promptText="Ante Bet ($5-$25)" />
+            <TextField fx:id="player1PairPlusBet" promptText="Pair Plus Bet ($5-$25)" />
         </VBox>
-        
-        <VBox alignment="CENTER">
-            <Label text="Player Cards" />
-            <HBox fx:id="playerCards" spacing="10">
-                <ImageView fx:id="playerCard1" fitHeight="100" fitWidth="70" />
-                <ImageView fx:id="playerCard2" fitHeight="100" fitWidth="70" />
-                <ImageView fx:id="playerCard3" fitHeight="100" fitWidth="70" />
-            </HBox>
+             <Button text="Confirm Bets" onAction="#confirmBets" alignment="CENTER"/>
+
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="Player 2 Bets" style="-fx-font-size: 16px;" />
+            <TextField fx:id="player2AnteBet" promptText="Ante Bet ($5-$25)" />
+            <TextField fx:id="player2PairPlusBet" promptText="Pair Plus Bet ($5-$25)" />
         </VBox>
     </HBox>
 
-    <!-- Betting Phase Elements -->
-    <VBox spacing="10" alignment="CENTER">
-        <Label text="Enter Bets (Between $5 and $25)" />
-        <HBox spacing="10" alignment="CENTER">
-            <Label text="Ante Bet: " />
-            <TextField fx:id="anteBetField" promptText="Enter Ante Bet" />
-            <Label text="Pair Plus Bet: " />
-            <TextField fx:id="pairPlusBetField" promptText="Enter Pair Plus Bet" />
-        </HBox>
-        <Button fx:id="beginGameButton" text="Begin Game" onAction="#beginGame" />
-    </VBox>
-
-    <!-- Gameplay Phase Elements -->
-    <VBox spacing="10" alignment="CENTER" fx:id="gameplayPhase" visible="false">
-        <HBox spacing="10">
-            <Button text="Play" onAction="#play" />
-            <Button text="Fold" onAction="#fold" />
-        </HBox>
-        <Label fx:id="currentBetAmountLabel" text="Current Bet Amount: $0" />
-        <Label fx:id="gameInfo" text="Game Info: " wrapText="true" />
-    </VBox>
-    
-    <!-- Player Wager and Winnings Display -->
     <HBox spacing="20" alignment="CENTER">
         <VBox alignment="CENTER">
             <Label text="Player One Wagers" />
-            <Label fx:id="player1AnteBetLabel" text="Ante: $0" />
-            <Label fx:id="player1PairPlusBetLabel" text="Pair Plus: $0" />
-            <Label fx:id="player1PlayBetLabel" text="Play: $0" />
             <Label fx:id="player1WinningsLabel" text="Total Winnings: $0" />
         </VBox>
         <VBox alignment="CENTER">
             <Label text="Player Two Wagers" />
-            <Label fx:id="player2AnteBetLabel" text="Ante: $0" />
-            <Label fx:id="player2PairPlusBetLabel" text="Pair Plus: $0" />
-            <Label fx:id="player2PlayBetLabel" text="Play: $0" />
             <Label fx:id="player2WinningsLabel" text="Total Winnings: $0" />
         </VBox>
     </HBox>
+    
+    <!-- Placeholder Labels for Cards -->
+    <HBox alignment="CENTER" spacing="20" style="-fx-padding: 20;">
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="Dealer Cards" style="-fx-font-size: 16px;" />
+            <Label fx:id="dealerCard1" text="Card 1" />
+            <Label fx:id="dealerCard2" text="Card 2" />
+            <Label fx:id="dealerCard3" text="Card 3" />
+        </VBox>
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="Player 1 Cards" style="-fx-font-size: 16px;" />
+            <Label fx:id="player1Card1" text="Card 1" />
+            <Label fx:id="player1Card2" text="Card 2" />
+            <Label fx:id="player1Card3" text="Card 3" />
+        </VBox>
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="Player 2 Cards" style="-fx-font-size: 16px;" />
+            <Label fx:id="player2Card1" text="Card 1" />
+            <Label fx:id="player2Card2" text="Card 2" />
+            <Label fx:id="player2Card3" text="Card 3" />
+        </VBox>
+    </HBox>
 
+    <!-- Player Action Buttons -->
+    <HBox alignment="CENTER" spacing="20">
+        <Button fx:id="playButton1" text="Player 1: Play" onAction="#playerDecision" disable="true" />
+        <Button fx:id="foldButton1" text="Player 1: Fold" onAction="#playerDecision" disable="true" />
+        <Button fx:id="playButton2" text="Player 2: Play" onAction="#playerDecision" disable="true" />
+        <Button fx:id="foldButton2" text="Player 2: Fold" onAction="#playerDecision" disable="true" />
+    </HBox>
+
+    <!-- Reset and Exit Buttons -->
+    <HBox alignment="CENTER" spacing="20">
+        <Button fx:id="resetButton" text="Reset Game" onAction="#freshStart" visible="false" />
+        <Button fx:id="exitButton" text="Exit Game" onAction="#exitGame" visible="false" />
+    </HBox>
+
+    <!-- Status Box -->
+    <HBox alignment="CENTER" spacing="20" style="-fx-padding: 20;">
+        <Label fx:id="statusBox" text="Game Status: Waiting for bets..." style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+    </HBox>
 </VBox>
