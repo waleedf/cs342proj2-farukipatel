@@ -9,7 +9,7 @@
     <!-- Title and Author Information -->
     <Label text="Three-Card Poker
 CS 342
-Waleed Faruki" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-alignment: center;" />
+Waleed Faruki and Abhi Patel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-alignment: center;" />
     
     <!-- Poker Card Image -->
     <ImageView fx:id="pokerCardImage" fitWidth="200" fitHeight="150" />
