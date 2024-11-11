@@ -24,4 +24,3 @@
         <Button fx:id="exitButton" text="Exit Game" onAction="#exitGame" style="-fx-font-size: 16px; -fx-padding: 10 20px; -fx-background-color: #FF6347;" />
     </HBox>
 </VBox>
-
