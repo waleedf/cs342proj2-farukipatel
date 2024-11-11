@@ -1,6 +1,8 @@
+import java.util.ArrayList;
+
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,12 +12,11 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
-
-import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import java.io.InputStream;
 
 public class JavaFXTemplate extends Application {
 
@@ -70,6 +71,10 @@ public class JavaFXTemplate extends Application {
 	private TextField player2AnteBet;
 	@FXML
 	private TextField player2PairPlusBet;
+	@FXML
+	private ImageView dealerCardOne, dealerCardTwo, dealerCardThree, playerCard1One, playerCard1Two, playerCard1Three,
+			playerCard2One, playerCard2Two, playerCard2Three;
+	private String cardPath = "/cards/";
 
 	@FXML
 	private Label dealerQualificationLabel;
@@ -252,6 +257,8 @@ public class JavaFXTemplate extends Application {
 				playerTurnIndicator.setText("Current Turn: Player One");
 			} else if (!player2DecisionMade) {
 				playerTurnIndicator.setText("Current Turn: Player Two");
+			} else {
+				playerTurnIndicator.setText("Dealer's Turn");
 			}
 		} else if (gameState == GameState.DEALER_REVEAL) {
 			playerTurnIndicator.setText("Dealer's Turn");
@@ -273,6 +280,18 @@ public class JavaFXTemplate extends Application {
 		pause.play();
 	}
 
+	private void updateCardImages(ArrayList<Card> hand, ImageView... imageViews) {
+		for (int i = 0; i < hand.size(); ++i) {
+			String filename = cardPath + hand.get(i).getImageFileName();
+			InputStream imageStream = getClass().getResourceAsStream(filename);
+			if (imageStream == null) {
+				System.out.println("Image not found: " + filename);
+				continue;
+			}
+			imageViews[i].setImage(new Image(imageStream));
+		}
+	}
+
 	private void dealCards() {
 		if (gameState == GameState.DEALING) {
 			// Dealing cards to players and dealer using Deck and Dealer classes
@@ -283,17 +302,9 @@ public class JavaFXTemplate extends Application {
 			dealer.dealDealersHand();
 
 			// Update card labels in UI
-			player1Card1.setText(player1Hand.get(0).toString());
-			player1Card2.setText(player1Hand.get(1).toString());
-			player1Card3.setText(player1Hand.get(2).toString());
-
-			player2Card1.setText(player2Hand.get(0).toString());
-			player2Card2.setText(player2Hand.get(1).toString());
-			player2Card3.setText(player2Hand.get(2).toString());
-
-			dealerCard1.setStyle("-fx-fill: lightgrey; -fx-stroke: black;"); // Example placeholder for now
-			dealerCard2.setStyle("-fx-fill: lightgrey; -fx-stroke: black;");
-			dealerCard3.setStyle("-fx-fill: lightgrey; -fx-stroke: black;");
+			updateCardImages(player1Hand, playerCard1One, playerCard1Two, playerCard1Three);
+			updateCardImages(player2Hand, playerCard2One, playerCard2Two, playerCard2Three);
+			updateCardImages(dealer.getDealersHand(), dealerCardOne, dealerCardTwo, dealerCardThree);
 
 			// Additional debug messages
 			System.out.println("Player 1 Hand dealt: " + player1.getHand());
@@ -315,13 +326,24 @@ public class JavaFXTemplate extends Application {
 
 	private void promptPlayerDecision() {
 		if (gameState == GameState.PLAYER_DECISION) {
-			// Enable Play/Fold buttons for players, manage turn-based decisions
-			playButton1.setDisable(false);
-			foldButton1.setDisable(false);
-			playerTurnIndicator.setText("Current Turn: Player One");
-			statusBox.setText("Game Status: Cards dealt. Player One's turn to decide.");
-
-			System.out.println("Player One's turn. Waiting for decision."); // Debug message
+			if (!player1DecisionMade) {
+				playButton1.setDisable(false);
+				foldButton1.setDisable(false);
+				playButton2.setDisable(true);
+				foldButton2.setDisable(true);
+				playerTurnIndicator.setText("Current Turn: Player One");
+				statusBox.setText("Game Status: Cards dealt. Player One's turn to decide.");
+			} else if (!player2DecisionMade) {
+				playButton1.setDisable(true);
+				foldButton1.setDisable(true);
+				playButton2.setDisable(false);
+				foldButton2.setDisable(false);
+				playerTurnIndicator.setText("Current Turn: Player Two");
+				statusBox.setText("Game Status: Cards dealt. Player Two's turn to decide.");
+			} else {
+				gameState = GameState.DEALER_REVEAL;
+				revealDealerHandWithPause();
+			}
 		}
 	}
 
@@ -332,18 +354,15 @@ public class JavaFXTemplate extends Application {
 		boolean play = sourceButton.getText().contains("Play");
 
 		if (gameState == GameState.PLAYER_DECISION) {
-			handlePlayerDecision(player1, sourceButton, playButton1, foldButton1, play);
-			player1DecisionMade = true;
-		} else if (sourceButton == playButton2 || sourceButton == foldButton2) {
-			handlePlayerDecision(player2, sourceButton, playButton2, foldButton2, play);
-			player2DecisionMade = true;
-		}
-
-		// Proceed if both players have made decisions
-		if (player1DecisionMade && player2DecisionMade) {
-			gameState = GameState.DEALER_REVEAL;
-			System.out.println("Both players have made their decisions. Transitioning to DEALER_REVEAL phase.");
-			revealDealerHandWithPause();
+			if (!player1DecisionMade && (sourceButton == playButton1 || sourceButton == foldButton1)) {
+				handlePlayerDecision(player1, play);
+				player1DecisionMade = true;
+				promptPlayerDecision(); // Move to Player Two's turn after Player One's decision
+			} else if (!player2DecisionMade && (sourceButton == playButton2 || sourceButton == foldButton2)) {
+				handlePlayerDecision(player2, play);
+				player2DecisionMade = true;
+				promptPlayerDecision(); // Proceed to dealer reveal after Player Two's decision
+			}
 		}
 	}
 
@@ -361,7 +380,7 @@ public class JavaFXTemplate extends Application {
 	private void revealDealerHand() {
 		if (gameState == GameState.DEALER_REVEAL) {
 			// Reveal dealer's cards
-			dealer.dealDealersHand(); // Assuming a dealCards() method in Dealer to deal cards to itself
+			dealer.dealDealersHand();
 
 			// Check if dealer qualifies
 			boolean dealerQualifies = ThreeCardLogic.dealerQualifies(dealer.getDealersHand());
@@ -381,6 +400,14 @@ public class JavaFXTemplate extends Application {
 		}
 	}
 
+	// Evaluate Hands and Calculate Results (Phase 6) with Pause Transition
+	private void evaluateHandsWithPause() {
+		PauseTransition pause = new PauseTransition(Duration.seconds(2));
+		pause.setOnFinished(event -> evaluateHands());
+		pause.play();
+		System.out.println("Evaluating hands with a pause."); // Debug message
+	}
+
 	private void evaluateHands() {
 		if (gameState == GameState.RESULT) {
 			// Compare player hands with the dealer's hand
@@ -389,30 +416,24 @@ public class JavaFXTemplate extends Application {
 
 			// Determine winnings for player 1
 			if (player1Result > 0) {
-				// Player 1 wins - calculate total winnings (Ante + Pair Plus + Play)
 				int winnings = player1.getAnteBet() + player1.getPairPlusBet() + player1.getPlayBet();
 				player1.updateTotalWinnings(winnings);
 				System.out.println("Player 1 wins! Total Winnings: $" + winnings);
 			} else if (player1Result < 0) {
-				// Player 1 loses - no additional winnings
 				System.out.println("Player 1 loses.");
 			} else {
-				// Tie - Player 1 gets their Ante and Play bets back
 				player1.updateTotalWinnings(player1.getAnteBet() + player1.getPlayBet());
 				System.out.println("Player 1 ties.");
 			}
 
 			// Determine winnings for player 2
 			if (player2Result > 0) {
-				// Player 2 wins - calculate total winnings (Ante + Pair Plus + Play)
 				int winnings = player2.getAnteBet() + player2.getPairPlusBet() + player2.getPlayBet();
 				player2.updateTotalWinnings(winnings);
 				System.out.println("Player 2 wins! Total Winnings: $" + winnings);
 			} else if (player2Result < 0) {
-				// Player 2 loses - no additional winnings
 				System.out.println("Player 2 loses.");
 			} else {
-				// Tie - Player 2 gets their Ante and Play bets back
 				player2.updateTotalWinnings(player2.getAnteBet() + player2.getPlayBet());
 				System.out.println("Player 2 ties.");
 			}
@@ -424,49 +445,20 @@ public class JavaFXTemplate extends Application {
 		}
 	}
 
-	// Evaluate Hands and Calculate Results (Phase 6) with Pause Transition
-	private void evaluateHandsWithPause() {
-		PauseTransition pause = new PauseTransition(Duration.seconds(2));
-		pause.setOnFinished(event -> evaluateHands());
-		pause.play();
-		System.out.println("Evaluating hands with a pause."); // Debug message
+	private void handlePlayerDecision(Player player, boolean play) {
+		if (play) {
+			player.setPlayBet(player.getAnteBet());
+		} else {
+			player.resetBets();
+		}
+		updatePlayerInfo();
 	}
 
-	private void handlePlayerDecision(Player player, Button sourceButton, Button playButton, Button foldButton,
-			boolean play) {
-		if (sourceButton == playButton || sourceButton == foldButton) {
-			if (play) {
-				player.setPlayBet(player.getAnteBet());
-			} else {
-				player.resetBets();
-			}
-		}
-
-		int player1Result = ThreeCardLogic.compareHands(player1.getHand(), dealer.getDealersHand());
-		int player2Result = ThreeCardLogic.compareHands(player2.getHand(), dealer.getDealersHand());
-
-		// Determine winnings for player 1
-		if (player1Result > 0) {
-			player1.updateTotalWinnings(player1.getAnteBet() + player1.getPairPlusBet() + player1.getPlayBet());
-			System.out.println("Player 1 wins!");
-		} else if (player1Result < 0) {
-			System.out.println("Player 1 loses.");
-		} else {
-			System.out.println("Player 1 ties.");
-		}
-
-		// Determine winnings for player 2
-		if (player2Result > 0) {
-			player2.updateTotalWinnings(player2.getAnteBet() + player2.getPairPlusBet() + player2.getPlayBet());
-			System.out.println("Player 2 wins!");
-		} else if (player2Result < 0) {
-			System.out.println("Player 2 loses.");
-		} else {
-			System.out.println("Player 2 ties.");
-		}
-		gameState = GameState.RESET;
-		System.out.println("Transitioning to RESET phase.");
-
+	// Update Player Information
+	private void updatePlayerInfo() {
+		player1WinningsLabel.setText("Total Winnings: $" + player1.getTotalWinnings());
+		player2WinningsLabel.setText("Total Winnings: $" + player2.getTotalWinnings());
+		statusBox.setText("Game Status: Player information updated.");
 	}
 
 	private void showResultsAndReset() {
@@ -517,5 +509,4 @@ public class JavaFXTemplate extends Application {
 			e.printStackTrace();
 		}
 	}
-
 }
